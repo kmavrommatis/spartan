@@ -5,7 +5,6 @@ use warnings;
 use Log::Log4perl;
 use FindBin;
 use lib "$FindBin::Bin";
-use lib "$FindBin::Bin/../..";
 use SetEnvironment;
 SetEnvironment::setEnv();
 use findtRNAs;

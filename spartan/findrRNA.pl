@@ -3,10 +3,8 @@ use strict;
 use warnings;
 use FindBin;
 use Log::Log4perl;
-use lib "$FindBin::Bin/..";
 use lib "$FindBin::Bin";
-use lib "$FindBin::Bin/../..";
-use lib "$FindBin::Bin/../../helpingHands";
+
 
 
 use SetEnvironment;

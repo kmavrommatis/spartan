@@ -5,8 +5,6 @@ use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin";
-use lib "$FindBin::Bin/..";
-use lib "$FindBin::Bin/../../helpingHands";
 use geneCallerVersions;
 use CommonFunc;
 use Log::Log4perl;

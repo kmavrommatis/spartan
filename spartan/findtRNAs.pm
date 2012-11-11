@@ -5,7 +5,6 @@ use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin";
-use lib "$FindBin::Bin/../../helpingHands";
 use tRNA;
 use CommonFunc;
 use geneCallerVersions;
