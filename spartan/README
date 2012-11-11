@@ -1,0 +1,13 @@
+In order to run spartan you need to have installed
+tRNAScan-SE
+ARAGORN
+infernal (v1.1)
+hmmsearch
+
+
+
+
+Modify SetParametersPipeline.pm to indicate the location of the programs
+
+
+

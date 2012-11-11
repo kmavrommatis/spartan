@@ -1,0 +1,5 @@
+2502082122	HMMER 3.0rc1 (February 2010)	rRNA	38296	39600	1058.7	+	.	ID=2502082122_A_rhs1; Version=HMMER 3.0rc1 (February 2010); Type=16S rRNA. Archaeal SSU; product=16S rRNA. Archaeal SSU; Name=16S rRNA. Archaeal SSU
+2502082123	HMMER 3.0rc1 (February 2010)	rRNA	187636	191301	1950.3	+	.	ID=2502082123_A_rhl1; Version=HMMER 3.0rc1 (February 2010); Type=23S rRNA. Archaeal LSU; product=23S rRNA. Archaeal LSU; Name=23S rRNA. Archaeal LSU
+2502082123	HMMER 3.0rc1 (February 2010)	exon	187636	188576	1950.3	+	.	ID=2502082123_A_rhl1.2;Parent=2502082123_A_rhl1; Version=HMMER 3.0rc1 (February 2010); Type=23S rRNA. Archaeal LSU; product=23S rRNA. Archaeal LSU; Name=23S rRNA. Archaeal LSU
+2502082123	HMMER 3.0rc1 (February 2010)	exon	189287	191301	1950.3	+	.	ID=2502082123_A_rhl1.1;Parent=2502082123_A_rhl1; Version=HMMER 3.0rc1 (February 2010); Type=23S rRNA. Archaeal LSU; product=23S rRNA. Archaeal LSU; Name=23S rRNA. Archaeal LSU
+2502082125	HMMER 3.0rc1 (February 2010)	rRNA	37202	37316	72.2	+	.	ID=2502082125_A_rht1; Version=HMMER 3.0rc1 (February 2010); Type=5S rRNA. Archaeal TSU; product=5S rRNA. Archaeal TSU; Name=5S rRNA. Archaeal TSU

@@ -1,0 +1,7 @@
+[INFO : findrRNA - 2012/08/10 14:52:25] - findrRNA.pl v1.0
+[INFO : findrRNA - 2012/08/10 14:52:25] - Input      : 2506520015.fna
+[INFO : findrRNA - 2012/08/10 14:52:25] - Output(gff): 2506520015.2.gff
+[INFO : findrRNA - 2012/08/10 14:52:25] - Domain     : B
+[INFO : findrRNA - 2012/08/10 14:52:25] - 5S         : 1
+[INFO : findrRNA - 2012/08/10 14:52:25] - 16S        : 1
+[INFO : findrRNA - 2012/08/10 14:52:25] - 23S        : 1
