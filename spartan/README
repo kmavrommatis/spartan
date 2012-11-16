@@ -7,7 +7,7 @@ hmmsearch
 
 
 
-Modify SetParametersPipeline.pm to indicate the location of the programs
+Modify SetEnvironment.pm to indicate the location of the programs
 
 
 
