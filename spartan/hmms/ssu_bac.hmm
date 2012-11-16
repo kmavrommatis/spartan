@@ -1,7 +1,7 @@
 HMMER3/b [3.0 | March 2010]
 NAME  bac_ssu
 LENG  1616
-DESC  16S rRNA. Archaeal SSU
+DESC  16S rRNA. Bacterial SSU
 ALPH  DNA
 RF    no
 CS    no
