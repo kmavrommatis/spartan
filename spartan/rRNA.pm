@@ -747,15 +747,17 @@ sub pass {
            
         my $modelFlex=10; # nucleotides from the ends of the models that we allow missing in order to accept the gene.
         my $hmmPerc=0.80; # percentage of model that is aligned of hte sequence to be considered full
-        my $hitPerc=0.20; # difference between hit size and model size 
+        my $hitPerc=0.80; # percentage of hit that is aligned to be considered full; 
         my $modelFlex2=10; # nucleotides from the ends of the sequence that we allow missing
         my $fullGene='no';
 		my $fullModel='no';
         if($modelName =~/ssu/){
         	$modelFlex=30; $modelFlex2=40;
+        	$hitPerc=0.8;
         }
         if($modelName =~/lsu/){
         	$modelFlex=50; $modelFlex2=60;
+#        	$hitPerc=0.8;
         }
         if($modelName =~/tsu/){
         	$modelFlex=20; $modelFlex2=20;
@@ -773,12 +775,12 @@ sub pass {
         	$envfrom=$envcoordinates->[0][0];
         	$envto=$envcoordinates->[-1][1];
         	foreach my $coordPair( @$envcoordinates ){
-        		$logger->trace("$coordPair->[0] - $coordPair->[1]");
+        		$logger->trace("$coordPair->[0] - $coordPair->[1]    (envelope coordinates)");
         		if($coordPair->[0] < $envfrom){ $envfrom=$coordPair->[0];}
         		if($coordPair->[1] > $envto){ $envto=$coordPair->[1];}
         		$sizeOnSequence+= $coordPair->[1] - $coordPair->[0]+1;
         	}
-        	$logger->trace( "The size of the envelope is $sizeOnSequence\n");
+        	$logger->trace( "The sum size of the envelope is $sizeOnSequence\n");
         }
         if(scalar(@$hmmcoordinates)>1){
         	$logger->trace( "We are checking a split location \n");
@@ -786,12 +788,12 @@ sub pass {
         	$hmmto=$hmmcoordinates->[-1][1];
         	$sizeOnModel =0;
         	foreach my $coordPair( @$hmmcoordinates ){
-        		$logger->trace( "$coordPair->[0] - $coordPair->[1]\n");
+        		$logger->trace( "$coordPair->[0] - $coordPair->[1]    (coordinates on model)");
         		if($coordPair->[0] < $hmmfrom){ $hmmfrom=$coordPair->[0];}
         		if($coordPair->[1] > $hmmto){ $hmmto=$coordPair->[1];}
         		$sizeOnModel+= $coordPair->[1] - $coordPair->[0]+1;
         	}
-        	$logger->trace( "The size of the model is $sizeOnModel\n");
+        	$logger->trace( "The sum size of the model is $sizeOnModel\n");
         }
         my $returnValue=0;
         # Tests to decide if the line is worth processing
@@ -800,12 +802,20 @@ sub pass {
         my ($keepModelTo, $keepModelFrom)=('n','n');
         if($hmmfrom < $modelFlex or $dom1 =~/^\[/ ){ $keepModelFrom = 'y';}
         if($hmmto> $modelSize - $modelFlex or $dom1 =~/\]$/ ){ $keepModelTo='y';}
-        $logger->trace("For model we keep start $keepModelFrom, we keep end $keepModelTo\n");
+#        $logger->trace("For model we keep start $keepModelFrom, we keep end $keepModelTo\n");
+        if($keepModelFrom eq 'y'){ $logger->trace("Model 5' is OK. Threshold is $modelFlex.");}
+        else{ $logger->trace("Model 5' is TRUNCATED. Threshold is $modelFlex.");}
+        if($keepModelTo eq 'y'){ $logger->trace("Model 3' is OK. Threshold is $modelFlex.");}
+        else{ $logger->trace("Model 3' is TRUNCATED. Threshold is $modelFlex.");}
         
         my ($keepHitTo, $keepHitFrom)=('n','n');
         if($envfrom < $modelFlex2 or $dom3 =~/^\[/ ){ $keepHitFrom = 'y';}
         if($envto> $sequenceSize - $modelFlex2 or $dom3 =~/\]$/ ){ $keepHitTo='y';}
-        $logger->trace("For hit we keep start $keepHitFrom, we keep end $keepHitTo\n");
+#        $logger->trace("For hit we keep start $keepHitFrom, we keep end $keepHitTo\n");
+        if($keepHitFrom eq 'y'){ $logger->trace("Hit 5' is OK. Threshold is $modelFlex2.");}
+        else{ $logger->trace("Hit 5' is TRUNCATED. Threshold is $modelFlex2.");}
+        if($keepHitTo eq 'y'){ $logger->trace("Hit 3' is OK. Threshold is $modelFlex2.");}
+        else{ $logger->trace("Hit 3' is TRUNCATED. Threshold is $modelFlex2.");}
         
         # check if the size of the hit (env from to env to ) is long enough
 	# Kostas Aug 25 2012
@@ -818,13 +828,13 @@ sub pass {
 #         my $sizeOnSequence=abs( $envto - $envfrom ) +1;
 
 
-	# checkt the size
+	# check the size
 
 	# the gene size is appropriate
-        if( $sizeOnSequence > $hitPerc * $modelSize){
-        	$fullGene='yes';
-        }else{ $fullGene ='no';}
-        $logger->trace("Since the size of the hit is $sizeOnSequence and the limit is ", $modelSize - $hitPerc * $modelSize," the flag for full gene is set to $fullGene\n");
+    if( $sizeOnSequence > $hitPerc * $modelSize){
+       	$fullGene='yes';
+    }else{ $fullGene ='no';}
+    $logger->trace("Since the size of the hit is $sizeOnSequence and the limit is ", $hitPerc * $modelSize," the flag for full gene is set to $fullGene\n");
 	# the model hit is appropriate        
 	if( $sizeOnModel > $hmmPerc * $modelSize){
 		$fullModel='yes';
@@ -840,29 +850,40 @@ sub pass {
         if ($test eq '?') {
         	$logger->trace("found ?. This means it is not a significant result\n");
             $returnValue= 0; # not significant result
-        } elsif($keepModelFrom eq 'y' and $keepModelTo eq 'y') {
+        }
+         elsif($keepModelFrom eq 'y' and $keepModelTo eq 'y') {
         	$logger->trace("we found a hit to the model from start to finish\n");
             $returnValue= 1; # we have a full hit to the model
-        } elsif($keepHitFrom eq 'y' and $keepHitTo eq 'y'){
-        	if($modelName !~/tsu/ or ($fullGene eq 'yes' and $modelName=~/tsu/) ){
+		}
+        elsif($keepHitFrom eq 'y' and $keepHitTo eq 'y'){
+#        	if($modelName !~/tsu/ or ($fullGene eq 'yes' and $modelName=~/tsu/) ){
+			if($fullGene eq 'yes'){
 			$logger->trace("the hit is covering the full size of the sequence\n");
         		$returnValue=1;
         	}
-        } elsif( $keepModelTo eq 'y' and $keepHitFrom eq 'y'){
-        	$logger->trace( "we have exceeded the start of the sequence and the end of the model is correct\n");
-        	$returnValue=1;
-        } elsif( $keepModelFrom eq 'y' and $keepHitTo eq 'y'){
-        	$logger->trace("we have exceeded the end of the sequence and the start of the model is correct\n");
-        	$returnValue=1;
-        } 
+         }
+#        elsif( $keepModelTo eq 'y' and $keepHitFrom eq 'y'){
+#        	$logger->trace( "we have exceeded the start of the sequence and the end of the model is correct\n");
+#        	$returnValue=1;
+#        } elsif( $keepModelFrom eq 'y' and $keepHitTo eq 'y'){
+#        	$logger->trace("we have exceeded the end of the sequence and the start of the model is correct\n");
+#        	$returnValue=1;
+#        } 
 
 
 	# final test based on sequence size
 	if($partialFlag eq 'on'){
+			
 			$logger->trace("For partial genes we do allow genes or models that are not full length");
+			if($keepHitFrom eq 'n' or $keepHitTo eq 'n'){
+				$returnValue=0;
+				$logger->trace("But in this case the hit on the sequence is not good enough");
+			}
 
 	}else{
-		if($fullGene eq 'no' or $fullModel eq 'no'){
+		if($fullGene eq 'no' or $fullModel eq 'no' or 
+			$keepModelFrom eq 'n' or $keepModelTo eq 'n' or
+			$keepHitFrom eq 'n' or $keepHitFrom eq 'n'){
 			$returnValue=0;
 			$logger->trace("For full only genes we don't allow genes or models that are not full length");
 		}
