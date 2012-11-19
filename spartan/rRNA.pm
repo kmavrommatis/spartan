@@ -847,21 +847,21 @@ sub pass {
 	
 
 	# the quality of the prediction is of poor quality
-        if ($test eq '?') {
-        	$logger->trace("found ?. This means it is not a significant result\n");
-            $returnValue= 0; # not significant result
-        }
-         elsif($keepModelFrom eq 'y' and $keepModelTo eq 'y') {
-        	$logger->trace("we found a hit to the model from start to finish\n");
-            $returnValue= 1; # we have a full hit to the model
-		}
-        elsif($keepHitFrom eq 'y' and $keepHitTo eq 'y'){
-#        	if($modelName !~/tsu/ or ($fullGene eq 'yes' and $modelName=~/tsu/) ){
-			if($fullGene eq 'yes'){
-			$logger->trace("the hit is covering the full size of the sequence\n");
-        		$returnValue=1;
-        	}
-         }
+#        if ($test eq '?') {
+#        	$logger->trace("found ?. This means it is not a significant result\n");
+#            $returnValue= 0; # not significant result
+#        }
+#        elsif($keepModelFrom eq 'y' and $keepModelTo eq 'y') {
+#        	$logger->trace("we found a hit to the model from start to finish\n");
+#            $returnValue= 1; # we have a full hit to the model
+#		}
+#        elsif($keepHitFrom eq 'y' and $keepHitTo eq 'y'){
+##        	if($modelName !~/tsu/ or ($fullGene eq 'yes' and $modelName=~/tsu/) ){
+##			if($fullGene eq 'yes'){
+#			$logger->trace("the hit is covering the full size of the sequence\n");
+#        		$returnValue=1;
+##        	}
+#         }
 #        elsif( $keepModelTo eq 'y' and $keepHitFrom eq 'y'){
 #        	$logger->trace( "we have exceeded the start of the sequence and the end of the model is correct\n");
 #        	$returnValue=1;
@@ -873,19 +873,27 @@ sub pass {
 
 	# final test based on sequence size
 	if($partialFlag eq 'on'){
+			# We don't care about the size as long as the boundaries of the query (on the genome) have been marked as 'y' for both sides
 			
 			$logger->trace("For partial genes we do allow genes or models that are not full length");
 			if($keepHitFrom eq 'n' or $keepHitTo eq 'n'){
 				$returnValue=0;
 				$logger->trace("But in this case the hit on the sequence is not good enough");
+			}else{
+				if($keepModelFrom eq 'n'){ $rec->[19] = "<". $rec->[19];}
+				if($keepModelTo   eq 'n'){ $rec->[20] = ">". $rec->[20];}
+				$returnValue=1;
 			}
 
 	}else{
+		# we need to verify that both the model and the sequence are complete and that the size of the gene is correct
 		if($fullGene eq 'no' or $fullModel eq 'no' or 
 			$keepModelFrom eq 'n' or $keepModelTo eq 'n' or
 			$keepHitFrom eq 'n' or $keepHitFrom eq 'n'){
 			$returnValue=0;
 			$logger->trace("For full only genes we don't allow genes or models that are not full length");
+		}else{
+			$returnValue=1;
 		}
 	}
 	
@@ -906,13 +914,17 @@ sub pass {
 #             $returnValue= 1; # we still have the full model
 #         } 
 
-        $logger->trace( "The size of the envelope is $sizeOnSequence. The model is $modelSize and the coverage of the model $sizeOnModel");
+    $logger->trace( "The size of the envelope is $sizeOnSequence. The model is $modelSize and the coverage of the model $sizeOnModel");
 	if($returnValue==1){
         	$logger->trace("Return will be 'full gene'\n");
 	}else{
 		$logger->trace("Return will be 'partial gene'\n");
 	}
-        
+    # the quality of the prediction is of poor quality
+    if ($test eq '?') {
+      	$logger->trace("found ?. This means it is not a significant result and this will superseed all other results.\n");
+        $returnValue= 0; # not significant result
+    }
         
 		$logger->trace("------------------------------------------------");
 		return $returnValue;
