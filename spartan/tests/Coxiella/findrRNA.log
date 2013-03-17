@@ -1,0 +1,27 @@
+[INFO : findrRNA - 2013/03/17 00:49:34] - findtRNA.pl v1.0
+[INFO : findrRNA - 2013/03/17 00:49:34] - Input      : Coxiella.fna
+[INFO : findrRNA - 2013/03/17 00:49:34] - Output(gff): Coxiella.tRNA
+[INFO : findrRNA - 2013/03/17 00:49:34] - Domain     : B,A,E
+[INFO : findrRNA - 2013/03/17 01:20:24] - findtRNA.pl v1.0
+[INFO : findrRNA - 2013/03/17 01:20:24] - Input      : Coxiella.fna
+[INFO : findrRNA - 2013/03/17 01:20:24] - Output(gff): Coxiella.tRNA
+[INFO : findrRNA - 2013/03/17 01:20:24] - Domain     : B,A,E
+[INFO : findrRNA - 2013/03/17 01:23:22] - findrRNA.pl v1.0
+[INFO : findrRNA - 2013/03/17 01:23:22] - Input      : Coxiella.fna
+[INFO : findrRNA - 2013/03/17 01:23:22] - Output(gff): Coxiella.rRNA
+[INFO : findrRNA - 2013/03/17 01:23:22] - Domain     : B,A,E
+[INFO : findrRNA - 2013/03/17 01:23:22] - 5S         : 1
+[INFO : findrRNA - 2013/03/17 01:23:22] - 16S        : 1
+[INFO : findrRNA - 2013/03/17 01:23:22] - 23S        : 1
+[INFO : findrRNA - 2013/03/17 01:23:22] - accepting only full size genes
+[INFO : rRNAm - 2013/03/17 01:23:22] - Executing command /opt/bin/hmmsearch -E 0.01 --noali --nobias --incE 0.01 --domE 0.1  -Z 1 --cpu 0 /Users/kmavrommatis/Documents/SourceCode/spartan/spartan/hmms/ssu_bac.hmm -
+[INFO : rRNAm - 2013/03/17 01:23:42] - Executing command /opt/bin/hmmsearch -E 0.01 --noali --nobias --incE 0.01 --domE 0.1  -Z 1 --cpu 0 /Users/kmavrommatis/Documents/SourceCode/spartan/spartan/hmms/ssu_arc.hmm -
+[INFO : rRNAm - 2013/03/17 01:24:01] - Executing command /opt/bin/hmmsearch -E 0.01 --noali --nobias --incE 0.01 --domE 0.1  -Z 1 --cpu 0 /Users/kmavrommatis/Documents/SourceCode/spartan/spartan/hmms/ssu_euk.hmm -
+[INFO : rRNAm - 2013/03/17 01:24:23] - Executing command /opt/bin/cmsearch --notextw  --cut_ga   --cpu 0  /Users/kmavrommatis/Documents/SourceCode/spartan/spartan/hmms//tsu_bac.cm Coxiella.fna
+[INFO : rRNAm - 2013/03/17 01:24:25] - Executing command /opt/bin/cmsearch --notextw  --cut_ga   --cpu 0  /Users/kmavrommatis/Documents/SourceCode/spartan/spartan/hmms//tsu_arc.cm Coxiella.fna
+[INFO : rRNAm - 2013/03/17 01:24:26] - Executing command /opt/bin/cmsearch --notextw  --cut_ga   --cpu 0  /Users/kmavrommatis/Documents/SourceCode/spartan/spartan/hmms//tsu_euk.cm Coxiella.fna
+[INFO : rRNAm - 2013/03/17 01:24:27] - Cmsearch found 1 rRNAs (tsu)!
+[INFO : rRNAm - 2013/03/17 01:24:27] - Executing command /opt/bin/hmmsearch -E 0.01 --noali --nobias --incE 0.01 --domE 0.1  -Z 1 --cpu 0 /Users/kmavrommatis/Documents/SourceCode/spartan/spartan/hmms/lsu_bac.hmm -
+[INFO : rRNAm - 2013/03/17 01:25:09] - Executing command /opt/bin/hmmsearch -E 0.01 --noali --nobias --incE 0.01 --domE 0.1  -Z 1 --cpu 0 /Users/kmavrommatis/Documents/SourceCode/spartan/spartan/hmms/lsu_arc.hmm -
+[INFO : rRNAm - 2013/03/17 01:25:50] - Executing command /opt/bin/hmmsearch -E 0.01 --noali --nobias --incE 0.01 --domE 0.1  -Z 1 --cpu 0 /Users/kmavrommatis/Documents/SourceCode/spartan/spartan/hmms/lsu_euk.hmm -
+[INFO : findrRNAm - 2013/03/17 01:26:38] - After consolidation of overlapping hits 3 RNA genes were stored in the file
