@@ -35,6 +35,7 @@ sub new{
        	if(!defined($self->{ inputFile })){$self->{logger}->logdie( "findrRNAs: No input file was provided");} 
        	if(!defined($self->{ outputFile})){$self->{outputFile} = $self->{inputFile}. ".rRNA";}
         $self->getVersion();
+        $self->{partial}=0;
         return $self;
 }
 
