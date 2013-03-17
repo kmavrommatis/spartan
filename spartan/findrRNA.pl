@@ -1,4 +1,4 @@
-#!/jgi/tools/bin/perl
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use FindBin;
@@ -17,6 +17,7 @@ use Getopt::Long;
 $Getopt::Long::ignorecase = 0;
 
 my ($inFasta,$outData, $help,$rnaType, $domain,$logFile,$partial);
+
 my $loglevel="INFO";
 GetOptions(     
 	"input:s"          		=> \$inFasta,
@@ -81,6 +82,7 @@ sub printInfo{
 	$logger->info( "16S        : ".  $h{ ssu });
 	$logger->info( "23S        : ".  $h{ lsu });
 	$logger->info( "accepting partial genes") if defined($partial);
+	$logger->info( "accepting only full size genes") if !defined($partial);
 }
 
 sub printUsage{
@@ -93,7 +95,7 @@ Arguments:
 	-gffout <output file>. The output file will be in gff format
 	-rnatype <RNA type to search>. The RNA type can be a comma list of tsu, ssu, lsu for 5S, 16S, 23S respectively. Default 'tsu,ssu,lsu' i.e. all
 	-domain <domain of organism>. The domain can be any combination of B, A, E for Bacteria, Archaea, Eukaryota respectively. Default BAE i.e. all
-	-partial. To allow for partial gene prediction, i.e. genes located at the ends of contigs.
+	-partial. To allow for partial gene prediction, i.e. genes located at the ends of contigs. [ default is look for full size genes ].
 	-log <logfile>
 	-loglevel <[INFO], DEBUG, TRACE>
 };
