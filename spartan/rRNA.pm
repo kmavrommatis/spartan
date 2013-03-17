@@ -28,7 +28,7 @@ sub findRRNA{
 	my $count=0;my $count2=0;
 	my $removedID={};
 	my $taxassignment={};
-	if(defined($partial)){$partialFlag = 'on';}
+	if(defined($partial) and $partial ==1 ){$partialFlag = 'on';}
 	foreach my $domain (@$domains) {
 		$logger->debug("Looking for rRNA with hmmer file:$contigFn, Domain:$domain, RNA type:$type");
 		$count = findRNA_hmmer($contigFn, $domain, $type, $dataArray,$taxassignment);
@@ -803,19 +803,25 @@ sub pass {
         if($hmmfrom < $modelFlex or $dom1 =~/^\[/ ){ $keepModelFrom = 'y';}
         if($hmmto> $modelSize - $modelFlex or $dom1 =~/\]$/ ){ $keepModelTo='y';}
 #        $logger->trace("For model we keep start $keepModelFrom, we keep end $keepModelTo\n");
-        if($keepModelFrom eq 'y'){ $logger->trace("Model 5' is OK. Threshold is $modelFlex.");}
+        if($keepModelFrom eq 'y'){ $logger->trace("Model 5' is OK. Threshold for rejecting is $modelFlex.");}
         else{ $logger->trace("Model 5' is TRUNCATED. Threshold is $modelFlex.");}
-        if($keepModelTo eq 'y'){ $logger->trace("Model 3' is OK. Threshold is $modelFlex.");}
+        if($keepModelTo eq 'y'){ $logger->trace("Model 3' is OK. Threshold for rejecting is $modelFlex.");}
         else{ $logger->trace("Model 3' is TRUNCATED. Threshold is $modelFlex.");}
         
-        my ($keepHitTo, $keepHitFrom)=('n','n');
-        if($envfrom < $modelFlex2 or $dom3 =~/^\[/ ){ $keepHitFrom = 'y';}
-        if($envto> $sequenceSize - $modelFlex2 or $dom3 =~/\]$/ ){ $keepHitTo='y';}
+        
+        #check if the hit on the sequence is close to the boundaries of the sequence (i.e. partial hit)
+   
+        my ($keepHitTo, $keepHitFrom)=($keepModelTo, $keepModelFrom);
+        if($keepModelTo eq 'n' and ($envfrom < $modelFlex2 ) ){ $keepHitFrom = 'y';}
+        if($keepModelFrom eq 'n' and ($envto> $sequenceSize - $modelFlex2 )  ){ $keepHitTo='y';}
+        # regardless of the above if hmmsearch has identified the hits as full size (highly unlikely to activate this code but just in case)
+        if($dom3 =~/^\[/ ){ $keepHitFrom = 'y';}
+        if($dom3 =~/\]$/) {$keepHitTo='y';}
 #        $logger->trace("For hit we keep start $keepHitFrom, we keep end $keepHitTo\n");
-        if($keepHitFrom eq 'y'){ $logger->trace("Hit 5' is OK. Threshold is $modelFlex2.");}
-        else{ $logger->trace("Hit 5' is TRUNCATED. Threshold is $modelFlex2.");}
-        if($keepHitTo eq 'y'){ $logger->trace("Hit 3' is OK. Threshold is $modelFlex2.");}
-        else{ $logger->trace("Hit 3' is TRUNCATED. Threshold is $modelFlex2.");}
+        if($keepHitFrom eq 'y'){ $logger->trace("Hit 5' is OK. Threshold is $modelFlex2. ");}
+        else{ $logger->trace("Hit 5' is TRUNCATED. Threshold is $modelFlex2.(used for partial predictions)");}
+        if($keepHitTo eq 'y'){ $logger->trace("Hit 3' is OK. Threshold is $modelFlex2. ");}
+        else{ $logger->trace("Hit 3' is TRUNCATED. Threshold is $modelFlex2.(used for partial predictions)");}
         
         # check if the size of the hit (env from to env to ) is long enough
 	# Kostas Aug 25 2012
@@ -828,7 +834,9 @@ sub pass {
 #         my $sizeOnSequence=abs( $envto - $envfrom ) +1;
 
 
-	# check the size
+	# check the size of the model and predicted genes
+	# this is to ensure that large chunks of the model are not missing inside the model
+	# when the boundaries of the model align very well
 
 	# the gene size is appropriate
     if( $sizeOnSequence > $hitPerc * $modelSize){
@@ -874,7 +882,7 @@ sub pass {
 	# final test based on sequence size
 	if($partialFlag eq 'on'){
 			# We don't care about the size as long as the boundaries of the query (on the genome) have been marked as 'y' for both sides
-			
+			$logger->trace("This run looks for partial and full size genes on the genome");
 			$logger->trace("For partial genes we do allow genes or models that are not full length");
 			if($keepHitFrom eq 'n' or $keepHitTo eq 'n'){
 				$returnValue=0;
@@ -886,6 +894,7 @@ sub pass {
 			}
 
 	}else{
+		$logger->trace("This run looks only for full size genes on the genome");
 		# we need to verify that both the model and the sequence are complete and that the size of the gene is correct
 		if($fullGene eq 'no' or $fullModel eq 'no' or 
 			$keepModelFrom eq 'n' or $keepModelTo eq 'n' or
