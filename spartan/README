@@ -1,13 +1,28 @@
 In order to run spartan you need to have installed
-tRNAScan-SE
+tRNAScan-SE (
 ARAGORN
 infernal (v1.1)
 hmmsearch
+NCBI legacy blast (aka blastall)
 
 
 
+Modify SetEnvironment.pm to indicate the location of the programs if they are not in the PATH
 
-Modify SetEnvironment.pm to indicate the location of the programs
+For convenience copies of the auxiliary software needed are included in the bundle of SPARTAN
+For questions/comments on the usage of these tools please contact the corresponding authors.
+This guide describes basic installation, for additional options please contact the corresponding authors.
+======= Installation of Aragorn ==================
+compile the file
+$  gcc aragorn1.2.34.c -o aragorn -O5
+copy the executable to a location found in your PATH
+eg.
+$  sudo cp aragorn /usr/local/bin
 
 
 
+======= Installation of trnascan ==================
+unpack the provided tarball
+$  tar -xvzf tRNAscan-SE.tar.gz
+
+Follow instructions in the INSTALL file
