@@ -1,5 +1,6 @@
 package SetEnvironment;
 use FindBin;
+use File::Basename;
 sub setEnv {
 	
 		$ENV{ PIPELINE_VERSION } = "4.0.0";
@@ -9,9 +10,12 @@ sub setEnv {
 		my $cmsearchBin=`which cmsearch`; chomp $cmsearchBin;
 		$ENV{ cmsearchBin11 } = $cmsearchBin;
 		if ( ! -e $ENV{ cmsearchBin11 } ) { die "The file ".$ENV{ cmsearchBin11 }." doesn't exist!" };
-		$ENV{ TRNASCAN_DIR } ="/usr/local/trnascan/";
+
+		my $trnascanBin = `which tRNAscan-SE`; chomp $trnascanBin;
+		my ($bin, $dir) =fileparse($trnascanBin);
+		$ENV{ TRNASCAN_DIR}=$dir;
 		if ( ! -d $ENV{ TRNASCAN_DIR } ) { die "The directory ".$ENV{ TRNASCAN_DIR }." doesn't exist!" };
-		$ENV{ trnascanBin } =$ENV{TRNASCAN_DIR}."/tRNAscan-SE";
+		$ENV{trnascanBin}=$trnascanBin;
 		my $aragornBin=`which aragorn`;chomp $aragornBin;
 		$ENV{ AragornBin } = $aragornBin;
 		if ( ! -e $ENV{ AragornBin } ) { die "The file ".$ENV{ AragornBin }." doesn't exist!" };
