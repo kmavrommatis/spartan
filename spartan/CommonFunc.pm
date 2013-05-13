@@ -59,15 +59,23 @@ sub isOverlapping{
 	my ($s1,$e1,$s2,$e2)=@_;
 	my $verbose=1;
 	my $overlap=0;
-	if ($e1< $s1){ ($s1,$e1)= swap($s1,$e1);}
-	if ($e2< $s2){ ($s2,$e2)= swap($s2,$e2);}
+	if (cleanCoord($e1)< cleanCoord($s1)){ ($s1,$e1)= swap($s1,$e1);}
+	if (cleanCoord($e2)< cleanCoord($s2)){ ($s2,$e2)= swap($s2,$e2);}
 
 
 
-	if($s2<= $s1 and $e2>= $e1){ $overlap= $e1-$s1 +1;}
-	if($s2>= $s1 and $e2<= $e1){ $overlap= $e2-$s2 +1;}
-	if($s1<= $s2 and $e1>= $s2 and $e1<= $e2){$overlap= $e1-$s2+1;}
-	if($s1>= $s2 and $s1<= $e2 and $e1>= $e2){$overlap= $e2-$s1+1;}
+	if(cleanCoord($s2)<= cleanCoord($s1) and cleanCoord($e2)>= cleanCoord($e1)){ 
+		$overlap= cleanCoord($e1)-cleanCoord($s1) +1;
+	}
+	if(cleanCoord($s2)>= cleanCoord($s1) and cleanCoord($e2)<= cleanCoord($e1)){ 
+		$overlap= cleanCoord($e2)-cleanCoord($s2) +1;
+	}
+	if(cleanCoord($s1)<= cleanCoord($s2) and cleanCoord($e1)>= cleanCoord($s2) and 
+		cleanCoord($e1)<= cleanCoord($e2)){
+			$overlap= cleanCoord($e1)-cleanCoord($s2)+1;
+	}
+	if(cleanCoord($s1)>= cleanCoord($s2) and cleanCoord($s1)<= cleanCoord($e2) and 
+		cleanCoord($e1)>= cleanCoord($e2)){$overlap= cleanCoord($e2)-cleanCoord($s1)+1;}
 	
  	print "isOverlapping:  $s1 - $e1 with $s2 - $e2 overlap $overlap\n" if $verbose==1;
 	return $overlap;
@@ -83,5 +91,13 @@ sub splitFn{
 	return($path,$filename,$fnBase,$extension);
 }
 
+
+sub cleanCoord{
+	my($coord)=@_;
+	
+	$coord=~s/^[<>]//;
+	return($coord);
+	
+}
 
 1;
