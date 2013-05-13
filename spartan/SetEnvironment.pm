@@ -30,8 +30,8 @@ sub setEnv {
 		
 		$ENV{ rrnaHmmsDir } = "$FindBin::RealBin/hmms/";
 		if ( ! -e $ENV{ rrnaHmmsDir } ) { die "The file ".$ENV{ rrnaHmmsDir }." doesn't exist!" };
-#		$ENV{ trnaDb } = $ENV{ PIPELINE_PATH }."/data/tRNA_db/tRNA.NR.fna";
-#		if ( ! -e $ENV{ trnaDb } ) { die "The file ".$ENV{ trnaDb }." doesn't exist!" };
+		$ENV{ trnaDb } = "$FindBin::RealBin/tRNA_db/tRNA.NR.fna";
+		if ( ! -e $ENV{ trnaDb } ) { die "The file ".$ENV{ trnaDb }." doesn't exist!" };
 		$ENV{ TRNAmodel } = "$FindBin::RealBin/hmms//trna.cm";
 		if ( ! -e $ENV{ TRNAmodel } ) { die "The file ".$ENV{ TRNAmodel }." doesn't exist!" };
 		

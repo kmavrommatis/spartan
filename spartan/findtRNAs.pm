@@ -30,7 +30,7 @@ sub new{
         } 
         
         # make sure that mandatory information is given
-       	if(!defined($self->{ inputFile })){die "findtRNAs: No input file was provided\n";} 
+       	if(!defined($self->{ inputFile })){$self->{logger}->logdie( "findtRNAs: No input file was provided\n");} 
        	if(!defined($self->{ outputFile})){$self->{outputFile} = $self->{inputFile}. ".tRNA";}
         $self->getVersion();
         return $self;
@@ -96,7 +96,7 @@ sub runPrediction{
 	# search
 	my @domains = split(",", $self->{domain});
 
-	print "\nChecking for tRNA genes...\n";
+	$self->{logger}->info("Checking for tRNA genes.");
 	tRNA::findTRNA($self->{inputFile}, \@domains, $dataArray, $trnaScanFlag, 
 						$trnaBlastFlag, $aragornFlag, $infernalFlag, $transTable, $circular);
 	
@@ -280,11 +280,11 @@ sub cleanRedundant{
 							}
 							print "\n";
 
-							die "\n\nA ".$query->[2]." (method: ".$query->[1].
+							$self->{logger}->logdie( "\n\nA ".$query->[2]." (method: ".$query->[1].
 								", score: $queryScore) and a ".
 								$hit->[2]."(method: ".$hit->[1].
 								", score: $hitScore) are overlapping on the ".
-								"sequence ".$query->[0]." and both have good scores!\n\n";
+								"sequence ".$query->[0]." and both have good scores!\n\n");
 						}
 					}
 				}
@@ -318,17 +318,17 @@ sub cleanRedundant{
 						}
 
 						else {
-							print "DataArray:\n";
+							my $str= "DataArray:\n";
 							foreach my $d (@$dataArray) {
-								print join("\t", @$d)."\n";
+								$str.= join("\t", @$d)."\n";
 							}
-							print "\n";
+							$self->{logger}->info($str);
 
-							die "\n\nA ".$query->[2]." (method: ".$query->[1].
+							$self->{logger}->logdie( "\n\nA ".$query->[2]." (method: ".$query->[1].
 								", score: $queryScore) and a ".
 								$hit->[2]."(method: ".$hit->[1].
 								", score: $hitScore) are overlapping on the ".
-								"sequence ".$query->[0]." and both have bad scores!\n\n";
+								"sequence ".$query->[0]." and both have bad scores!\n\n");
 						}
 					}
 				}	
@@ -376,7 +376,7 @@ sub parseAnnotation {
 # Store the output in the gff file
 sub storeGFF{
 	my ($self, $dataArray) = @_;
-	print "Storing data in ", $self->{outputFile} ."\n";
+	$self->{logger}->debug( "Storing data in ", $self->{outputFile} ."\n");
 	open (my $wfh, ">".$self->{outputFile}) or 
 					die "Unable to open ".$self->{outputFile}.": $!\n";
 	#print "Storing ".scalar(@$dataArray)." RNAs in the file...\n";
@@ -388,7 +388,7 @@ sub storeGFF{
 	}
 	close $wfh;
 	
-	print "\n$geneCount RNA genes were stored in the file.\n";
+	$self->{logger}->info(  "\n$geneCount RNA genes were stored in the file.\n");
 }
 
 # get the score for this gene

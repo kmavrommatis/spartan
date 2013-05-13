@@ -77,7 +77,7 @@ sub isOverlapping{
 	if(cleanCoord($s1)>= cleanCoord($s2) and cleanCoord($s1)<= cleanCoord($e2) and 
 		cleanCoord($e1)>= cleanCoord($e2)){$overlap= cleanCoord($e2)-cleanCoord($s1)+1;}
 	
- 	print "isOverlapping:  $s1 - $e1 with $s2 - $e2 overlap $overlap\n" if $verbose==1;
+# 	print "isOverlapping:  $s1 - $e1 with $s2 - $e2 overlap $overlap\n" if $verbose==1;
 	return $overlap;
 }
 

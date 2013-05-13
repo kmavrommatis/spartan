@@ -15,12 +15,50 @@ The program has been tested under the following conditions:
 The hmm models for 16S and 23S rRNAs were build by Jim Tripp (email HJTripp@lbl.gov)
 The covariance models for 5S were build by Kostas Mavrommatis (email KMavrommatis@lbl.gov)
 Test datasets were built by Jim Tripp (email HJTripp@lbl.gov)
+Code was written by Kostas Mavrommatis. Modules of the code (Aragorn.pm) were modified from code written by Marcel Huntemann.
+
+==== HOW TO RUN =========
+
+Program: findtRNA.pl by Konstantinos Mavrommatis (KMavrommatis@lbl.gov)
+Use this program to predict tRNA genes in bacterial, archaeal and eukaryotic genomes
+Arguments:
+	--input <input file>. Input file is in fasta format
+	--gffout <output file>. The output file will be in gff format
+	--domain <domain of organism>. The domain can be any combination of B, A, E for Bacteria, Archaea, Eukaryota respectively. Default BAE i.e. all
+	--genometype <type of sequence>. The genome type can be any of metagenome, isolate. Default isolate.
+	--notrnascan To prevent tRNAScan from predicting genes
+	--noinfernal To prevent infernal from predicting genes
+	--blast  To run blast for partial genes (This can increase run time significantly)
+	--log <logfile> Default is input file with the extension .log
+	--loglevel <[INFO], DEBUG, TRACE>
+	--help This screen
+
+
+the program runs trnascan, infernal, aragorn and blast to predict genes.
+Aragorn is used only as an additional layer on top of infernal, i.e it is used to annotate infernal predictions since infernal does not predict the
+anticodon of the gene. 
+BLAST i used only in the terminal 150bp of each contig to search for fragments of genes that the other methods failed to detect.
+
+
+Program: findrRNA.pl by Konstantinos Mavrommatis (KMavrommatis@lbl.gov)
+Use this program to predict rRNA (23S, 16S, 5S) genes in bacterial, archaeal and eukaryotic genomes
+Arguments:
+	--input <input file>. Input file is in fasta format
+	--gffout <output file>. The output file will be in gff format
+	--rnatype <RNA type to search>. The RNA type can be a comma list of tsu, ssu, lsu for 5S, 16S, 23S respectively. Default 'tsu,ssu,lsu' i.e. all
+	--domain <domain of organism>. The domain can be any combination of B, A, E for Bacteria, Archaea, Eukaryota respectively. Default BAE i.e. all
+	--partial. To allow for partial gene prediction, i.e. genes located at the ends of contigs. [ default is look for full size genes ].
+	--log <logfile> Default is input file with the extension .log
+	--loglevel <[INFO], DEBUG, TRACE>
+	--help This screen
+
+the program compare the sequences to JGI developed HMM models for ssu and lsu and JGI developed covariance models for tsu.
 
 
 ==== INSTALLATION NOTES ============
-
-
 Modify SetEnvironment.pm to indicate the location of the programs if they are not in the PATH
+If you wish to use the tRNA blast option you need to build a non redundant database of full size tRNA genes from a set of genomes.
+
 
 For convenience copies of the auxiliary software needed are included in the bundle of SPARTAN
 For questions/comments on the usage of these tools please contact the corresponding authors.

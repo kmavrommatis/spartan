@@ -33,14 +33,14 @@ if(!defined($domain)){$domain="BAE";}
 if(!defined($inFasta)){
 	printUsage();exit(1);
 }
-if(!defined($logFile)){$logFile="findrRNA.log";}
+if(!defined($logFile)){$logFile="$inFasta.log";}
 my $logger=setupLog();
 # Check for tRNAs
 my $tRnaFn=$outData;
 
 
 my $domainCopy = $domain;
-if (lc($prType) eq "metagenome" or $domain eq "BAE" ) { $domainCopy = "B,A,E"; }
+if (($prType and lc($prType) eq "metagenome") or $domain eq "BAE" ) { $domainCopy = "B,A,E"; }
 if (lc($domainCopy) eq "ba") { $domainCopy = "B,A"; }
 require findtRNAs;
 printInfo();
@@ -95,12 +95,16 @@ sub printUsage{
 Program: findtRNA.pl by Konstantinos Mavrommatis (KMavrommatis@lbl.gov)
 Use this program to predict tRNA genes in bacterial, archaeal and eukaryotic genomes
 Arguments:
-	-input <input file>. Input file is in fasta format
-	-gffout <output file>. The output file will be in gff format
-	-domain <domain of organism>. The domain can be any combination of B, A, E for Bacteria, Archaea, Eukaryota respectively. Default BAE i.e. all
-	-genometype <type of sequence>. The genome type can be any of metagenome, isolate. Default isolate.
-	-log <logfile>
-	-loglevel <[INFO], DEBUB, TRACE>
+	--input <input file>. Input file is in fasta format
+	--gffout <output file>. The output file will be in gff format
+	--domain <domain of organism>. The domain can be any combination of B, A, E for Bacteria, Archaea, Eukaryota respectively. Default BAE i.e. all
+	--genometype <type of sequence>. The genome type can be any of metagenome, isolate. Default isolate.
+	--notrnascan To prevent tRNAScan from predicting genes 
+	--noinfernal To prevent infernal from predicting genes
+	--blast  To run blast for partial genes (This can increase run time significantly)
+	--log <logfile> Default is input file with the extension .log
+	--loglevel <[INFO], DEBUG, TRACE>
+	--help This screen
 };
 }
 

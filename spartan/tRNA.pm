@@ -9,7 +9,7 @@ use geneCallerVersions;
 use CommonFunc;
 use Log::Log4perl;
 use IPC::Open2;
-
+use Log::Log4perl;
 use Bio::SeqIO;
 
 
@@ -22,27 +22,27 @@ sub findTRNA{
 	if(!defined($trnaScanFlag)) { $trnaScanFlag='on'; }
 	if(!defined($aragornFlag)) { $aragornFlag='off'; }
 	if(!defined($infernalFlag)) { $infernalFlag='on'; }
-	print "Processing with tRNAscan $trnaScanFlag.\n";
-	print "Processing with BLAST $trnaBlastFlag.\n";
-	print "Processing with Aragorn $aragornFlag.\n";
-	print "Processing with Infernal $infernalFlag.\n";
+	$logger->info( "Processing with tRNAscan $trnaScanFlag.\n");
+	$logger->info(  "Processing with BLAST $trnaBlastFlag.\n");
+	$logger->info(  "Processing with Aragorn $aragornFlag.\n");
+	$logger->info(  "Processing with Infernal $infernalFlag.\n");
 	my $counter = 0;
 	foreach my $domain(@$domains){
 		$counter += &findTRNA_trnascan($contigsFn, $domain, 
 										$dataArray) if $trnaScanFlag ne 'off';
 	}
-	print "\ntRNAscan found $counter tRNAs!\n\n\n";
+	$logger->info(  "\tRNAscan found $counter tRNAs!");
 	
 	$counter = &findTRNA_blast($contigsFn, 
 									$dataArray) if $trnaBlastFlag ne 'off';
-	print "\ntrnaBLAST found $counter tRNAs!\n\n";
+	$logger->info(  "\ttrnaBLAST found $counter tRNAs!");
 	
 	$counter = &findTRNA_aragorn($contigsFn, $dataArray, $transTable, 
 										$circular) if $aragornFlag ne 'off';
-	print "\nAragorn found $counter tRNAs!\n\n";
+	$logger->info(  "\tAragorn found $counter tRNAs!");
 	
 	$counter = &findTRNA_infernal($contigsFn, $dataArray) if $infernalFlag ne 'off';
-	print "\nInfernal found $counter tRNAs!\n\n";
+	$logger->info(  "\tInfernal found $counter tRNAs!");
 }
 
 
@@ -51,7 +51,7 @@ sub findTRNA_blast {
 	my ($contigFn, $dataArray) = @_;
 	
 	my $programVersion = geneCallerVersions::getVersion("trnablast");
-	print "Predicting tRNA genes with BLAST ($programVersion)\n";
+	$logger->info(  "Predicting tRNA genes with BLAST ($programVersion)\n");
 	my $counter = 0;
 	my $gene_id = 0;
 	#open contig file and retrieve sequences
@@ -73,14 +73,14 @@ sub findTRNA_blast {
 			my $cmd = $ENV{ blastallBin };
 			$cmd .= " -m8 -a1 -p blastn -d $ENV{ trnaDb } ";
 			$cmd .= $s;
-			print "Running the blast command $cmd\n" if $ENV{ verbose } eq "Yes";
+			$logger->debug(  "Running the blast command $cmd\n" );
 			my $pid=open2(my $blastReaderFh, my $blastWriterFh, "$cmd "); 
 # 			print "Created child $pid\n";
-			if (!defined($pid)){die "Cannot execute $cmd\n";}
+			if (!defined($pid)){$logger->logdie( "Cannot execute $cmd\n");}
 # 			print "Running Blast\n";
 			print $blastWriterFh ">". $seqObj->display_id()."\n".
 							CommonFunc::wrapSeq( $seqObj->seq())."\n";
-			close $blastWriterFh  or die "Command $cmd failed (write to pipe)\n";;
+			close $blastWriterFh  or $logger->logdie( "Command $cmd failed (write to pipe)\n");;
 # 			print "Command send to blast ($pid)\n";
 			# get only the first line from the blast results
 			my $readLine='no'; # changes to yes after the first line has been read, and avoids reloading hits
@@ -107,7 +107,7 @@ sub findTRNA_blast {
 				if($alnLen <40){next;}
 				# the hit needs to be at the end of the sequence
 				if($contig_start >$slack and $contig_end < $seqObj->length()-$slack) {
-					print "Reject 1. Hit is in the middle of the sequence\n" if $ENV{ verbose } eq "Yes";
+					$logger->debug( "Reject 1. Hit is in the middle of the sequence\n");
 					next;
 				}
 				# the hit should cover a fragment of the trna 
@@ -143,7 +143,7 @@ sub findTRNA_blast {
 				$gene_id++;
 	# 				print "Line accepted\n";
 			}
-			close $blastReaderFh or die "Something bad happened with the $cmd after it started\n";
+			close $blastReaderFh or $logger->logdie( "Something bad happened with the $cmd after it started\n");
 			
 			waitpid($pid,0);
 # 			print "Child $pid finished\n";
@@ -161,7 +161,7 @@ sub findTRNA_blast {
 sub findTRNA_trnascan{
 	my ($contigFn, $domain , $dataArray )=@_;
 	my $programVersion = geneCallerVersions::getVersion("trnascan");
-	print "Predicting tRNA genes with $programVersion\n";
+	$logger->info( "Predicting tRNA genes with $programVersion\n");
 	$domain=lc($domain);
 	my $gene_id=0;
 	my $options = "-q";           # output without headers
@@ -180,10 +180,10 @@ sub findTRNA_trnascan{
 #	$cmdline .= " -l $logFn -m $statFn";
 	$cmdline .= " $contigFn";
 
- 	print "tRNA command line will be: $cmdline\n";
+ 	$logger->debug( "tRNAscan command line will be: $cmdline\n");
 #        system( "$cmdline 1>$outFn 2>/dev/null");   # note - no error catching here!!
     my @output=`$cmdline`;
-	if ( $? ) { die "Command failed: $cmdline $!"; }
+	if ( $? ) { $logger->logdie( "Command failed: $cmdline $!"); }
 	my $parse='off';
 	
 	my $counter=0;
@@ -251,7 +251,7 @@ sub findTRNA_aragorn{
 	my ($contigFn, $dataArray, $transTable, $circular) = @_;
 	
 	my $programVersion = geneCallerVersions::getVersion("aragorn");
-	print "Predicting tRNA genes with $programVersion\n";
+	$logger->info( "Predicting tRNA genes with $programVersion\n");
 	
 	require Aragorn;
 	
@@ -274,7 +274,7 @@ sub findTRNA_aragorn{
 	$aragornObj->runPrediction();
 
 	# Put results in data array
-	open FH, "<", $outFile or die "Cannot open aragorn output: $!\n";
+	open FH, "<", $outFile or $logger->logdie( "Cannot open aragorn output: $!\n");
 	my $counter = 0;
 	while(<FH>) {
 		chomp $_;
@@ -296,7 +296,7 @@ sub findTRNA_infernal{
 	my ($contigsFn, $dataArray) = @_;
 	require cmsearchParser;
 	my $programVersion = geneCallerVersions::getVersion("cmsearch11");
-	print "Predicting tRNA genes with covariance models and $programVersion\n";
+	$logger->info("Predicting tRNA genes with covariance models and $programVersion\n");
 	my $evalue_cutoff=0.01;
 
 	my $covFn=$ENV{TRNAmodel};
@@ -315,7 +315,7 @@ sub findTRNA_infernal{
 	my $cmdline =  $ENV{ cmsearchBin11 }.
 				" --cut_ga --notextw -Z 1 --cpu 0 ".
 				"$covFn $contigsFn";
-	print "Executing command $cmdline\n";
+	$logger->debug( "Executing command $cmdline\n");
 	open (HMMER, "$cmdline|") or die "Command failed: $cmdline $!";
 
 	my $cm=cmsearchParser->new( '-cmOutStream'=>\*HMMER );

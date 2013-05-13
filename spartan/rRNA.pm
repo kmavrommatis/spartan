@@ -508,14 +508,16 @@ sub runHMMPrediction{
 			# 1 indicates processing the forward strand
 			# -1 indicates processing the revcom sequence
 	my $seq;
+	my $sequenceCounter=0;
 	for(;;){
+		
 		if($orientation ==0){
 			$seq=$inStream->next_seq();
 			$orientation =1;
 		}
 		if(!defined($seq)){last;}
 		#print "passing sequence ", $seq->display_id(),"\n";
-
+		$sequenceCounter++;
 		my $pid= open2(  my $Reader, my $Writer, "$cmdline " );
 		if (!defined($pid)){die "Cannot execute $cmdline\n";}
 		my $sequenceString="";
@@ -594,7 +596,7 @@ sub runHMMPrediction{
 		if($orientation ==1){$orientation =-1;}
 		else{$orientation =0;}
 	} # end of processing $contigFn
-	print "End of processing all input sequences \n";    
+	$logger->info( "End of processing all ($sequenceCounter) input sequences (sense/antisense strands) \n");    
 }
 
 

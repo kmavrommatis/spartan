@@ -26,16 +26,16 @@ sub new{
     		$self->{ $a } = $arguments[++$i];
     	}
 	}
-	
+	$self->{logger} =  Log::Log4perl->get_logger('Aragorn');
 	$self->{bin} = $ENV{ AragornBin };
 	$self->{options} = " -d -w ";
         
     # Make sure that mandatory information is given
-    if( !defined($self->{ inputFile }) ) { die "Aragorn: No input file was provided!\n"; } 
+    if( !defined($self->{ inputFile }) ) { $self->{logger}->logdie( "Aragorn: No input file was provided!\n"); } 
     if( !defined($self->{ outputFile}) ) { $self->{outputFile} = $self->{inputFile}.".aragorn.gff"; }
     $self->{bin} = $ENV{ AragornBin };
     if( !defined($self->{bin} ) or !-x $self->{bin} ) { 
-    	die "Aragorn: Cannot locate or execute Aragorn executable!\n";
+    	$self->{logger}->( "Aragorn: Cannot locate or execute Aragorn executable!\n");
     }
  	
    	$self->getVersion();
@@ -49,7 +49,7 @@ sub runPrediction {
 	
 	my $cmd = $self->{bin}.$self->{options}.$self->{inputFile};
 	
-	print "Aragorn: running cmd: $cmd\n";
+	$self->{logger}->debug( "Aragorn: running cmd: $cmd\n");
 	
 	open WH, ">", $self->{outputFile} or die "Can't open ".$self->{outputFile}.": $!\n";
 	
@@ -129,7 +129,7 @@ sub runPrediction {
 					$sA[4] =~ s/\s+$//;
 					$tagPeptide = $sA[4];
 				}
-				else { die "Aragorn: No instructions for $sA[1]!\n"; }
+				else { $self->{logger}->logdie( "Aragorn: No instructions for $sA[1]!\n"); }
 				
 				
 				# Print to outfile in gff format
