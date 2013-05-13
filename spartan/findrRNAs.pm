@@ -110,13 +110,15 @@ sub runPrediction{
 }
 
 
+
 # Resolve problems with overlapping hits
 sub cleanRedundant{
 	my ($self,$dataArray, $removedID) = @_;
 
 	# Sort hit array by seq, start, length.
-	@$dataArray = sort{ $a->[0] cmp $b->[0] || $a->[3] <=> $b->[3] || 
-						abs($b->[3]-$b->[4]) <=> abs($a->[3]-$a->[4]) } @$dataArray;
+	@$dataArray = sort{ $a->[0] cmp $b->[0] || CommonFunc::cleanCoord($a->[3]) <=> CommonFunc::cleanCoord($b->[3]) || 
+						abs(CommonFunc::cleanCoord($b->[3])-CommonFunc::cleanCoord($b->[4])) <=> 
+						abs(CommonFunc::cleanCoord($a->[3])-CommonFunc::cleanCoord($a->[4])) } @$dataArray;
 	
 	# Score cutoffs for the different method.
 	# Besides tRNAscan all values are per nucleotide.
@@ -152,10 +154,14 @@ sub cleanRedundant{
 			my $hitHash = &parseAnnotation($hit->[8]);
 			if ($query->[0] ne $hit->[0]) { next; }
 			if ($removedID->{ $hitHash->{ID} }) { next; }
-			my $overlap = CommonFunc::isOverlapping($query->[3], $query->[4], $hit->[3], $hit->[4]);
+			my $overlap = CommonFunc::isOverlapping(
+					CommonFunc::cleanCoord($query->[3]), 
+					CommonFunc::cleanCoord($query->[4]), 
+					CommonFunc::cleanCoord($hit->[3]), 
+					CommonFunc::cleanCoord($hit->[4]));
 			my $overlapFlag = 'no';
-			my $queryGeneLength = abs($query->[4] - $query->[3]) + 1;
-			my $hitGeneLength = abs($hit->[4] - $hit->[3]) + 1;
+			my $queryGeneLength = abs(CommonFunc::cleanCoord($query->[4]) - CommonFunc::cleanCoord($query->[3])) + 1;
+			my $hitGeneLength = abs(CommonFunc::cleanCoord($hit->[4]) - CommonFunc::cleanCoord($hit->[3])) + 1;
 			if($overlap > 30 or $overlap > 0.2 * $queryGeneLength or $overlap > 0.2 * $hitGeneLength) {
 				$overlapFlag = 'yes';
 			}
