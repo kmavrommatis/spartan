@@ -5,6 +5,19 @@ infernal (v1.1)
 hmmsearch
 NCBI legacy blast (aka blastall)
 
+The program has been tested under the following conditions:
+- Detect RNA genes in finished genomes. In these cases the program detects consistently genes. (Escherichia colI)
+- Detect RNA genes in finished genomes that contain introns. (Coxiella)
+- Detect RNA genes at the ends of contigs (e.g. fragmented genes) (ACD.
+- two files Coxiella_23S_withIntrons.fna, Ecoli_rRNA.fna contain mock sequences with introns and at the end of contigs
+  In the corresponding directories the *.rRNA files contain the predictions from SPARTAN for all the input files.
+
+The hmm models for 16S and 23S rRNAs were build by Jim Tripp (email HJTripp@lbl.gov)
+The covariance models for 5S were build by Kostas Mavrommatis (email KMavrommatis@lbl.gov)
+Test datasets were built by Jim Tripp (email HJTripp@lbl.gov)
+
+
+==== INSTALLATION NOTES ============
 
 
 Modify SetEnvironment.pm to indicate the location of the programs if they are not in the PATH
