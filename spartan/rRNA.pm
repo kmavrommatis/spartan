@@ -368,7 +368,7 @@ sub processPartial{
 			$intronSize=findGap(  [$ar->[$i]->[16] , $ar->[$i]->[17]], [$ar->[$i-1]->[16] , $ar->[$i-1]->[17]] );
 			
 			
-			$logger->trace(  "Intron size " ,$ar->[$i]->[16]," - ", $ar->[$i-1]->[17] ,"=", $intronSize," maximum allowd size is $intronMaxSize");
+			$logger->trace(  "Intron size " ,$ar->[$i]->[16]," - ", $ar->[$i-1]->[17] ,"=", $intronSize," maximum allowed size is $intronMaxSize");
 			$logger->trace(  "Gap on model $ar->[$i-1]->[13]/$ar->[$i]->[13] to $ar->[$i-1]->[14]/$ar->[$i]->[14] =", $gapOnModel, " max/min for gap is $gapOnModelMax/$gapOnModelMin" );
 			
 			if (  ($ar->[$i]->[3] eq $ar->[$i-1]->[3]) and   #the hits are to the same model
@@ -737,7 +737,8 @@ sub mergeCoordinates{
 # is good enough to be considered valid
 sub pass {
    		my ($rec)=@_;
-   		
+   		$logger->trace("=======================================");
+   		$logger->trace("vvvvvvvvvvvvvvvv pass vvvvvvvvvvvvvvvvv");
         my( $sequenceName,$sequenceSize,$description,
             $modelName,$modelSize,$strand,$sp,$no,$test,$score,$bias,$c_eval,$i_eval,
             $hmmfrom,$hmmto,$dom1,$alifrom,$alito,$dom2,$envfrom,$envto,$dom3,$acc,$hmmcoordinates,$envcoordinates)=@$rec;
@@ -765,7 +766,7 @@ sub pass {
         }
         my $sizeOnSequence= abs($envto-$envfrom)+1;
         my $sizeOnModel = abs($hmmto-$hmmfrom) +1;
-        $logger->trace("------------------- pass -----------------------\n");
+        
         $logger->trace("Model $modelName size: $modelSize\n");
         $logger->trace("$sequenceName ($sequenceSize)\t$line\n");
         
@@ -803,25 +804,32 @@ sub pass {
         if($hmmfrom < $modelFlex or $dom1 =~/^\[/ ){ $keepModelFrom = 'y';}
         if($hmmto> $modelSize - $modelFlex or $dom1 =~/\]$/ ){ $keepModelTo='y';}
 #        $logger->trace("For model we keep start $keepModelFrom, we keep end $keepModelTo\n");
-        if($keepModelFrom eq 'y'){ $logger->trace("Model 5' is OK. Threshold for rejecting is $modelFlex.");}
-        else{ $logger->trace("Model 5' is TRUNCATED. Threshold is $modelFlex.");}
-        if($keepModelTo eq 'y'){ $logger->trace("Model 3' is OK. Threshold for rejecting is $modelFlex.");}
-        else{ $logger->trace("Model 3' is TRUNCATED. Threshold is $modelFlex.");}
+        if($keepModelFrom eq 'y'){ $logger->trace("Model 5' is FULL. Threshold for rejecting is $modelFlex.");}
+        else{ $logger->trace("Model 5' is TRUNCATED. Threshold to consider the hit to the model truncated is $modelFlex from the end.");}
+        if($keepModelTo eq 'y'){ $logger->trace("Model 3' is FULL. Threshold for rejecting is $modelFlex.");}
+        else{ $logger->trace("Model 3' is TRUNCATED. Threshold to consider the hit to the model truncated is $modelFlex from the end.");}
         
         
         #check if the hit on the sequence is close to the boundaries of the sequence (i.e. partial hit)
    
         my ($keepHitTo, $keepHitFrom)=($keepModelTo, $keepModelFrom);
-        if($keepModelTo eq 'n' and ($envfrom < $modelFlex2 ) ){ $keepHitFrom = 'y';}
-        if($keepModelFrom eq 'n' and ($envto> $sequenceSize - $modelFlex2 )  ){ $keepHitTo='y';}
+      	$logger->trace("The hit starts at ", $envfrom  ," bp from the 5' of the contig and the threshold to accept as fragment is at ", $modelFlex2);
+        $logger->trace("The hit ends at ", $sequenceSize - $envto," bp from the 3' of the contig and the threshold to accept as fragment is at ", $modelFlex2);
+    
+        if($keepModelFrom eq 'n' and ($envfrom < $modelFlex2 ) ){ 
+        	$keepHitFrom = 'y';
+        }
+        if($keepModelTo eq 'n' and ($envto> $sequenceSize - $modelFlex2 )  ){ 
+        	$keepHitTo='y';
+        }
         # regardless of the above if hmmsearch has identified the hits as full size (highly unlikely to activate this code but just in case)
         if($dom3 =~/^\[/ ){ $keepHitFrom = 'y';}
         if($dom3 =~/\]$/) {$keepHitTo='y';}
 #        $logger->trace("For hit we keep start $keepHitFrom, we keep end $keepHitTo\n");
-        if($keepHitFrom eq 'y'){ $logger->trace("Hit 5' is OK. Threshold is $modelFlex2. ");}
-        else{ $logger->trace("Hit 5' is TRUNCATED. Threshold is $modelFlex2.(used for partial predictions)");}
-        if($keepHitTo eq 'y'){ $logger->trace("Hit 3' is OK. Threshold is $modelFlex2. ");}
-        else{ $logger->trace("Hit 3' is TRUNCATED. Threshold is $modelFlex2.(used for partial predictions)");}
+        if($keepHitFrom eq 'y'){ $logger->trace("Hit 5' is FULL. Threshold to consider the hit truncated is $modelFlex2 bp. ");}
+        else{ $logger->trace("Hit 5' is TRUNCATED. Threshold to consider the hit truncated is $modelFlex2 bp.(used for partial predictions)");}
+        if($keepHitTo eq 'y'){ $logger->trace("Hit 3' is FULL. Threshold to consider the hit truncated is $modelFlex2 bp. ");}
+        else{ $logger->trace("Hit 3' is TRUNCATED. Threshold to consider the hit truncated is $modelFlex2 bp.(used for partial predictions)");}
         
         # check if the size of the hit (env from to env to ) is long enough
 	# Kostas Aug 25 2012
@@ -842,14 +850,14 @@ sub pass {
     if( $sizeOnSequence > $hitPerc * $modelSize){
        	$fullGene='yes';
     }else{ $fullGene ='no';}
-    $logger->trace("Since the size of the hit is $sizeOnSequence and the limit is ", $hitPerc * $modelSize," the flag for full gene is set to $fullGene\n");
+    $logger->trace("Since the size of the hit is $sizeOnSequence and the limit to cosider it full is ", $hitPerc * $modelSize," the flag for full gene is set to $fullGene\n");
 	# the model hit is appropriate        
 	if( $sizeOnModel > $hmmPerc * $modelSize){
 		$fullModel='yes';
 	}else{
 		$fullModel='no';
 	}
-	$logger->trace("Since the size of the model is $sizeOnModel and the limit is ",  $hmmPerc * $modelSize," the flag for full model is set to $fullModel\n");
+	$logger->trace("Since the size of the model is $sizeOnModel and the limit to consider it full is ",  $hmmPerc * $modelSize," the flag for full model is set to $fullModel\n");
 
 	# check the boundaries
 	
@@ -925,17 +933,18 @@ sub pass {
 
     $logger->trace( "The size of the envelope is $sizeOnSequence. The model is $modelSize and the coverage of the model $sizeOnModel");
 	if($returnValue==1){
-        	$logger->trace("Return will be 'full gene'\n");
+        	$logger->trace("Return will be 'full gene' i.e. can be accepted as is (even if it is a fragment)\n");
 	}else{
-		$logger->trace("Return will be 'partial gene'\n");
+		$logger->trace("Return will be 'partial gene' i.e. needs to be merged to be accepted.\n");
 	}
     # the quality of the prediction is of poor quality
     if ($test eq '?') {
       	$logger->trace("found ?. This means it is not a significant result and this will superseed all other results.\n");
         $returnValue= 0; # not significant result
     }
-        
-		$logger->trace("------------------------------------------------");
+        $logger->trace("^^^^^^^^^^ end of pass ^^^^^^^^^^^^^^^^");
+		$logger->trace("=======================================");
+   		
 		return $returnValue;
 }	
 1;
